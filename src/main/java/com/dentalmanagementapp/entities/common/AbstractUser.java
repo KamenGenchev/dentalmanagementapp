@@ -1,9 +1,6 @@
 package com.dentalmanagementapp.entities.common;
 
 import jakarta.persistence.*;
-
-import java.util.Collections;
-
 @MappedSuperclass
 public abstract class AbstractUser {
     @Id

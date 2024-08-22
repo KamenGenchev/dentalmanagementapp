@@ -2,25 +2,23 @@ package com.dentalmanagementapp.entities;
 
 import com.dentalmanagementapp.entities.common.AbstractUser;
 import jakarta.persistence.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
-import java.util.Collection;
-import java.util.Collections;
+import org.springframework.beans.factory.annotation.Value;
 import java.util.Set;
 
 @Entity
 public class Dentist extends AbstractUser {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Transient
+    @Value("${roles.dentist}")
+    private String role;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Patient> patientList;
-
     @Override
     public String getRole() {
-        return "ROLE_DENTIST";
+        return role;
     }
-
 
     public Set<Patient> getPatientList() {
         return patientList;

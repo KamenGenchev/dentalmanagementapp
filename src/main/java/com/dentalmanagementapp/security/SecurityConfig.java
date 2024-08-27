@@ -29,6 +29,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("api/public/**").permitAll()
                         .requestMatchers("api/auth/**").permitAll()
+                        .requestMatchers("api/records/**").hasRole("DENTIST")
+                        .requestMatchers("api/patient").hasRole("PATIENT")
                         .anyRequest().authenticated()
                 ).addFilterBefore(jwtRequestFilter, JwtRequestFilter.class);
         return httpSecurity.build();

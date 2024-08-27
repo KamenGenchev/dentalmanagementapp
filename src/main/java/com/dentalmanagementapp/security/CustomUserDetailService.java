@@ -12,7 +12,6 @@ public class CustomUserDetailService implements UserDetailsService {
     private final DentistRepository dentistRepository;
     private final PatientRepository patientRepository;
 
-    //todo Admin repo and func
     @Autowired
     public CustomUserDetailService(@NotNull DentistRepository dentistRepository, @NotNull PatientRepository patientRepository) {
         this.dentistRepository = dentistRepository;
@@ -22,7 +21,7 @@ public class CustomUserDetailService implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return dentistRepository.findByUsername(username)
+        return dentistRepository.findByEmail(username)
                 .map(CustomUserDetails::new)
                 .orElseGet(() -> patientRepository.findByUsername(username)
                         .map(CustomUserDetails::new)

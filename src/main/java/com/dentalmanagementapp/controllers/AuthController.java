@@ -42,8 +42,8 @@ public class AuthController {
         return ResponseEntity.ok().headers(headers).body(jwtResponse);
     }
 
-    @PostMapping("/login/patients")
-    public ResponseEntity<Object> patientLogin(@Valid @Email @NotBlank @RequestBody String email) {
+    @PostMapping("/register/patients")
+    public ResponseEntity<Object> registerPatient(@Valid @Email @NotBlank @RequestBody String email) {
         authService.registerPatient(email);
         return ResponseEntity.ok("Check email for password.");
     }

@@ -7,10 +7,10 @@ import com.dentalmanagementapp.dtos.LoginResponseDto;
 import com.dentalmanagementapp.service.AuthService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,32 +28,24 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<Object> registerDentistAndLogin(@Valid @RequestBody DentistRegisterDto dto) {
-        authService.registerDentist(dto); //todo validate whether dentist is not already registered
+        authService.registerDentist(dto);
         LoginDto loginDto = new LoginDto(dto.email(), dto.password());
         return login(loginDto);
     }
 
     @PostMapping("/login")
     public ResponseEntity<Object> login(@Valid @RequestBody LoginDto dto) {
-        try {
-            LoginResponseDto jwtResponse = authService.authenticateUser(dto);
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + jwtResponse.jwt());
-            return ResponseEntity.ok().headers(headers).body(jwtResponse);
+        LoginResponseDto jwtResponse = authService.authenticateUser(dto);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + jwtResponse.jwt());
 
-        } catch (AuthenticationException exception) {
-            return ResponseEntity.badRequest().body("Login failed");
-        }
+        return ResponseEntity.ok().headers(headers).body(jwtResponse);
     }
 
     @PostMapping("/login/patients")
-    public ResponseEntity<Object> patientLogin(@Email @RequestBody String email) {
-        if (authService.registerPatient(email)) {
-            return ResponseEntity.ok("Check email for password.");
-        }
-        return ResponseEntity.badRequest().body("Patient registration failed");
+    public ResponseEntity<Object> patientLogin(@Valid @Email @NotBlank @RequestBody String email) {
+        authService.registerPatient(email);
+        return ResponseEntity.ok("Check email for password.");
     }
-
-
 }
 

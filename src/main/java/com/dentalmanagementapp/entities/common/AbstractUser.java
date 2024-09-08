@@ -1,15 +1,18 @@
 package com.dentalmanagementapp.entities.common;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.SoftDelete;
 
 import java.util.Objects;
 
 @MappedSuperclass
+@SoftDelete
 public abstract class AbstractUser {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
+
+    protected boolean deleted;
 
     @Column(nullable = false, length = 50)
     protected String firstName;
@@ -22,6 +25,15 @@ public abstract class AbstractUser {
     @Column(nullable = false, length = 25)
     protected String password;
 
+    protected AbstractUser() {
+    }
+
+    protected AbstractUser(String firstName, String lastName, String email) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+    }
+
     public String getUsername() {
         return email;
     }
@@ -30,20 +42,16 @@ public abstract class AbstractUser {
         this.email = email;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     public String getFirstName() {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
     public String getLastName() {
         return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
     }
 
     public Long getId() {

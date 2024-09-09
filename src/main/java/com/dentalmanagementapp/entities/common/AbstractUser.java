@@ -22,7 +22,7 @@ public abstract class AbstractUser {
 
     @Column(unique = true, length = 200, nullable = false)
     protected String email;
-    @Column(nullable = false, length = 25)
+    @Column(nullable = false, length = 30)
     protected String password;
 
     protected AbstractUser() {

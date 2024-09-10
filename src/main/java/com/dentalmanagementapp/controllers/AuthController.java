@@ -1,13 +1,11 @@
 package com.dentalmanagementapp.controllers;
 
 
-import com.dentalmanagementapp.dtos.LoginDto;
-import com.dentalmanagementapp.dtos.DentistRegisterDto;
-import com.dentalmanagementapp.dtos.LoginResponseDto;
+import com.dentalmanagementapp.dtos.auth.LoginDto;
+import com.dentalmanagementapp.dtos.dentist.DentistRegisterDto;
+import com.dentalmanagementapp.dtos.auth.LoginResponseDto;
 import com.dentalmanagementapp.service.AuthService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -39,10 +37,5 @@ public class AuthController {
         return ResponseEntity.ok().headers(headers).body(jwtResponse);
     }
 
-    @PostMapping("/register/patients")
-    public ResponseEntity<Object> registerPatient(@Valid @Email @NotBlank @RequestParam String email) {
-        authService.registerPatient(email);
-        return ResponseEntity.ok("Check email for password.");
-    }
 }
 

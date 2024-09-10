@@ -1,9 +1,10 @@
 package com.dentalmanagementapp.service;
 
-import com.dentalmanagementapp.dtos.DentistRegisterDto;
-import com.dentalmanagementapp.entities.Dentist;
-import jakarta.validation.Valid;
+import com.dentalmanagementapp.dtos.dentist.DentistRegisterDto;
+import com.dentalmanagementapp.dtos.auth.LoginDto;
+import com.dentalmanagementapp.dtos.auth.LoginResponseDto;
 
 public interface AuthService {
-    Dentist registerDentist(@Valid DentistRegisterDto dto);
+    void registerDentist(DentistRegisterDto dto);
+    LoginResponseDto authenticateUser(LoginDto dto);
 }

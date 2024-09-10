@@ -1,10 +1,10 @@
 package com.dentalmanagementapp.controllers;
 
-import com.dentalmanagementapp.dtos.PatientAddDto;
-import com.dentalmanagementapp.dtos.PatientDetailedDto;
+import com.dentalmanagementapp.dtos.patient.PatientAddDto;
+import com.dentalmanagementapp.dtos.patient.PatientDetailedDto;
 import com.dentalmanagementapp.dtos.dentist.DentistDetailsDto;
 import com.dentalmanagementapp.dtos.dentist.DentistDto;
-import com.dentalmanagementapp.dtos.PatientDto;
+import com.dentalmanagementapp.dtos.patient.PatientDto;
 import com.dentalmanagementapp.service.DentistService;
 import com.dentalmanagementapp.service.PatientService;
 import jakarta.validation.Valid;

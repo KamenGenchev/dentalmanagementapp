@@ -5,6 +5,7 @@ import com.dentalmanagementapp.dtos.patient.PatientDetailedDto;
 import com.dentalmanagementapp.dtos.dentist.DentistDetailsDto;
 import com.dentalmanagementapp.dtos.dentist.DentistDto;
 import com.dentalmanagementapp.dtos.patient.PatientDto;
+import com.dentalmanagementapp.dtos.patient.PatientUpdateDto;
 import com.dentalmanagementapp.service.DentistService;
 import com.dentalmanagementapp.service.PatientService;
 import jakarta.validation.Valid;
@@ -90,8 +91,8 @@ public class AdminController {
     }
 
     @PutMapping("/patients/{id}")
-    public ResponseEntity<Void> updatePatient(@PathVariable Long id, @Valid @RequestBody PatientDto patientDto) {
-        patientService.updatePatient(id, patientDto);
+    public ResponseEntity<Void> updatePatient(@PathVariable Long id, @Valid @RequestBody PatientUpdateDto patientUpdateDto) {
+        patientService.updatePatient(id, patientUpdateDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

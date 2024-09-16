@@ -2,7 +2,7 @@ package com.dentalmanagementapp.controllers;
 
 
 import com.dentalmanagementapp.dtos.auth.LoginDto;
-import com.dentalmanagementapp.dtos.dentist.DentistRegisterDto;
+import com.dentalmanagementapp.dtos.auth.DentistRegisterDto;
 import com.dentalmanagementapp.dtos.auth.LoginResponseDto;
 import com.dentalmanagementapp.service.AuthService;
 import jakarta.validation.Valid;

@@ -1,17 +1,23 @@
 package com.dentalmanagementapp.service.implementation;
 
+import com.dentalmanagementapp.dtos.PatientRecordsDto;
 import com.dentalmanagementapp.dtos.patient.PatientAddDto;
 import com.dentalmanagementapp.dtos.patient.PatientDetailedDto;
 import com.dentalmanagementapp.dtos.patient.PatientDto;
 import com.dentalmanagementapp.dtos.patient.PatientUpdateDto;
+import com.dentalmanagementapp.dtos.record.OrthodonticRecordDto;
+import com.dentalmanagementapp.dtos.record.PolyvalentRecordDto;
 import com.dentalmanagementapp.entities.Patient;
 import com.dentalmanagementapp.exception.custom.NotFoundException;
 import com.dentalmanagementapp.mappers.PatientMapper;
 import com.dentalmanagementapp.repository.PatientRepository;
+import com.dentalmanagementapp.service.OrthodonticRecordService;
 import com.dentalmanagementapp.service.PatientService;
+import com.dentalmanagementapp.service.PolyvalentRecordService;
 import com.dentalmanagementapp.validation.PatientValidation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -26,38 +32,26 @@ public class PatientServiceImpl implements PatientService {
     private final PatientRepository patientRepository;
     private final PatientValidation patientValidator;
     private final PatientMapper patientMapper;
-    private final DentistPatientServiceImpl dentistPatientService;
+    private final OrthodonticRecordService orthodonticRecordService;
+    private final PolyvalentRecordService polyvalentRecordService;
 
     @Autowired
-    public PatientServiceImpl(PatientRepository patientRepository, PatientValidation patientValidator, PatientMapper patientMapper, DentistPatientServiceImpl dentistPatientService) {
+    public PatientServiceImpl(PatientRepository patientRepository, PatientValidation patientValidator, PatientMapper patientMapper, OrthodonticRecordService orthodonticRecordService, PolyvalentRecordService polyvalentRecordService) {
         this.patientRepository = patientRepository;
         this.patientValidator = patientValidator;
         this.patientMapper = patientMapper;
-        this.dentistPatientService = dentistPatientService;
+        this.orthodonticRecordService = orthodonticRecordService;
+        this.polyvalentRecordService = polyvalentRecordService;
     }
 
     @Override
     @Transactional
     public Long createPatient(@Valid PatientAddDto dto) {
-        Patient patient = createAndSavePatient(dto);
-        return patient.getId();
-    }
+        patientValidator.validateEmailUniqueness(dto.email());
 
-    @Override
-    @Transactional
-    public Long createPatientWithDentist(@Valid PatientAddDto dto, Long dentistId) {
-        patientValidator.requireNonNull(dentistId, "Dentist ID cannot be null");
-        Patient patient = createAndSavePatient(dto);
-        dentistPatientService.savePatientToDentist(patient, dentistId);
-
-        return patient.getId();
-    }
-
-    private Patient createAndSavePatient(@Valid PatientAddDto dto) {
-        patientValidator.assertDoesNotExistByEmail(dto.email());
         Patient patient = patientMapper.toPatient(dto);
         patientRepository.save(patient);
-        return patient;
+        return patient.getId();
     }
 
     @Override
@@ -86,7 +80,7 @@ public class PatientServiceImpl implements PatientService {
                 .orElseThrow(() -> new NotFoundException("Patient with id: " + id + " was not found"));
 
         if (!Objects.equals(patient.getEmail(), dto.email())) {
-            patientValidator.assertDoesNotExistByEmail(dto.email());
+            patientValidator.validateEmailUniqueness(dto.email());
         }
 
         patient.updateInformation(
@@ -105,9 +99,20 @@ public class PatientServiceImpl implements PatientService {
     @Transactional
     public void deletePatient(Long id) {
         patientValidator.requireNonNull(id, "Patient ID cannot be null");
-        patientValidator.assertExistsById(id);
+        patientValidator.validatePatientExists(id);
 
         patientRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<PatientRecordsDto> getAllRecordsForPatient() {
+        List<PolyvalentRecordDto> polyvalentRecords = polyvalentRecordService.getAllRecords();
+        List<OrthodonticRecordDto> orthodonticRecords = orthodonticRecordService.getAllRecords();
+
+        PatientRecordsDto patientRecords = new PatientRecordsDto(polyvalentRecords, orthodonticRecords);
+
+        return ResponseEntity.ok(patientRecords);
     }
 
 }

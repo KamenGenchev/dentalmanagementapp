@@ -13,14 +13,15 @@ import java.util.Date;
 @Component
 
 public class JwtUtil {
-    @Value("${SECRET_KEY}") //check if works
+    @Value("${jwtKey}")
     private String secretKey;
+    private static final long EXPIRATION_TIME = 10 * 60 * 1000;
 
     public String generateToken(String email) {
         return JWT.create()
                 .withSubject(email)
                 .withIssuedAt(new Date(System.currentTimeMillis()))
-                .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .sign(Algorithm.HMAC384(secretKey));
     }
 

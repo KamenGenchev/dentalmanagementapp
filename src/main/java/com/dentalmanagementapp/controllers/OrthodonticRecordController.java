@@ -1,7 +1,8 @@
 package com.dentalmanagementapp.controllers;
 
-import com.dentalmanagementapp.dtos.OrthodonticRecordDto;
-import com.dentalmanagementapp.service.RecordService;
+import com.dentalmanagementapp.dtos.record.OrthodonticRecordDto;
+import com.dentalmanagementapp.dtos.record.OrthodonticRecordUpdateDto;
+import com.dentalmanagementapp.service.implementation.OrthodonticRecordServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +15,10 @@ import java.util.List;
 @RequestMapping("/api/records/orthodontic")
 @RestController
 public class OrthodonticRecordController {
-    private final RecordService<OrthodonticRecordDto> recordService;
+    private final OrthodonticRecordServiceImpl recordService;
 
     @Autowired
-    public OrthodonticRecordController(RecordService<OrthodonticRecordDto> recordService) {
+    public OrthodonticRecordController(OrthodonticRecordServiceImpl recordService) {
         this.recordService = recordService;
     }
 
@@ -28,9 +29,9 @@ public class OrthodonticRecordController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<OrthodonticRecordDto>> getOrthodonticRecord(@PathVariable("id") Long id) {
-        List<OrthodonticRecordDto> records = recordService.getAllRecords();
-        return ResponseEntity.ok(records);
+    public ResponseEntity<OrthodonticRecordDto> getOrthodonticRecord(@PathVariable("id") Long id) {
+        OrthodonticRecordDto record = recordService.getRecord(id);
+        return ResponseEntity.ok(record);
     }
 
     @PostMapping()
@@ -45,13 +46,13 @@ public class OrthodonticRecordController {
     }
 
     @PutMapping({"/{id}"})
-    public ResponseEntity<Void> updateOrthodonticRecord(@PathVariable("id") Long id, @Valid @RequestBody OrthodonticRecordDto record) {
-        recordService.updateRecord(record);
+    public ResponseEntity<Void> updateOrthodonticRecord(@PathVariable("id") Long id, @Valid @RequestBody OrthodonticRecordUpdateDto updateDto) {
+        recordService.updateRecord(id, updateDto);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOrthodonticRecord(@PathVariable("id") Long id, @Valid @RequestBody OrthodonticRecordDto record) {
+    public ResponseEntity<Void> deleteOrthodonticRecord(@PathVariable("id") Long id) {
         recordService.deleteRecord(id);
 
         return ResponseEntity.noContent().build();

@@ -6,7 +6,6 @@ import com.dentalmanagementapp.entities.OrthodonticRecord;
 import com.dentalmanagementapp.exception.custom.NotFoundException;
 import com.dentalmanagementapp.mappers.OrthodonticRecordMapper;
 import com.dentalmanagementapp.repository.OrthodonticRecordRepository;
-import com.dentalmanagementapp.security.CurrentUser;
 import com.dentalmanagementapp.service.OrthodonticRecordService;
 import com.dentalmanagementapp.validation.OrthodonticRecordValidation;
 import jakarta.validation.Valid;
@@ -35,28 +34,18 @@ public class OrthodonticRecordServiceImpl implements OrthodonticRecordService {
 
     @Override
     @Transactional
-    public List<OrthodonticRecordDto> getAllRecords(CurrentUser currentUser) {
-        orthodonticRecordValidation.validateCurrentUser(currentUser);
-
-        return orthodonticRecordRepository.findAllWithFilter(
-                        currentUser.currentUserId(),
-                        currentUser.isAdmin()
-                ).stream()
+    public List<OrthodonticRecordDto> getAllRecords() {
+        return orthodonticRecordRepository.findAllWithFilter().stream()
                 .map(orthodonticRecordMapper::toDto)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public OrthodonticRecordDto getRecord(Long id, CurrentUser currentUser) {
+    public OrthodonticRecordDto getRecord(Long id) {
         orthodonticRecordValidation.requireNonNull(id, "Record ID cannot be null");
-        orthodonticRecordValidation.validateCurrentUser(currentUser);
 
-        return orthodonticRecordRepository.findOrthodonticRecordWithAccess(
-                        id,
-                        currentUser.currentUserId(),
-                        currentUser.isAdmin()
-                )
+        return orthodonticRecordRepository.findOrthodonticRecordWithAccess(id)
                 .map(orthodonticRecordMapper::toDto)
                 .orElseThrow(() -> new NotFoundException("Orthodontic record with id: " + id + " was not found"));
     }
@@ -68,27 +57,20 @@ public class OrthodonticRecordServiceImpl implements OrthodonticRecordService {
     }
 
     @Override
-    public void updateRecord(Long id, @Valid OrthodonticRecordUpdateDto recordUpdateDto, CurrentUser currentUser) {
+    public void updateRecord(Long id, @Valid OrthodonticRecordUpdateDto recordUpdateDto) {
         orthodonticRecordValidation.requireNonNull(id, "Record ID cannot be null");
-        orthodonticRecordValidation.validateCurrentUser(currentUser);
 
-        OrthodonticRecord record = orthodonticRecordRepository.findOrthodonticRecordWithAccess(
-                        id,
-                        currentUser.currentUserId(),
-                        currentUser.isAdmin()
-                )
+        OrthodonticRecord record = orthodonticRecordRepository.findOrthodonticRecordWithAccess(id)
                 .orElseThrow(() -> new NotFoundException("Orthodontic record with id: " + id + " was not found"));
 
         record = orthodonticRecordMapper.toEntity(recordUpdateDto, record);
-
         orthodonticRecordRepository.save(record);
     }
 
     @Override
-    public void deleteRecord(Long id, CurrentUser currentUser) {
+    public void deleteRecord(Long id) {
         orthodonticRecordValidation.requireNonNull(id, "Record ID cannot be null");
-        orthodonticRecordValidation.validateCurrentUser(currentUser);
-        orthodonticRecordValidation.validateRecordAccess(id, currentUser);
+        orthodonticRecordValidation.validateRecordAccess(id);
 
         orthodonticRecordRepository.deleteById(id);
     }

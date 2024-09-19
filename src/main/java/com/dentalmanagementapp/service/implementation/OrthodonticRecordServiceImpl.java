@@ -33,7 +33,7 @@ public class OrthodonticRecordServiceImpl implements OrthodonticRecordService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public List<OrthodonticRecordDto> getAllRecords() {
         return orthodonticRecordRepository.findAllWithFilter().stream()
                 .map(orthodonticRecordMapper::toDto)
@@ -43,7 +43,7 @@ public class OrthodonticRecordServiceImpl implements OrthodonticRecordService {
     @Override
     @Transactional(readOnly = true)
     public OrthodonticRecordDto getRecord(Long id) {
-        orthodonticRecordValidation.requireNonNull(id, "Record ID cannot be null");
+        orthodonticRecordValidation.requireNonNullId(id);
 
         return orthodonticRecordRepository.findOrthodonticRecordWithAccess(id)
                 .map(orthodonticRecordMapper::toDto)
@@ -57,8 +57,9 @@ public class OrthodonticRecordServiceImpl implements OrthodonticRecordService {
     }
 
     @Override
+    @Transactional
     public void updateRecord(Long id, @Valid OrthodonticRecordUpdateDto recordUpdateDto) {
-        orthodonticRecordValidation.requireNonNull(id, "Record ID cannot be null");
+        orthodonticRecordValidation.requireNonNullId(id);
 
         OrthodonticRecord record = orthodonticRecordRepository.findOrthodonticRecordWithAccess(id)
                 .orElseThrow(() -> new NotFoundException("Orthodontic record with id: " + id + " was not found"));
@@ -68,8 +69,9 @@ public class OrthodonticRecordServiceImpl implements OrthodonticRecordService {
     }
 
     @Override
+    @Transactional
     public void deleteRecord(Long id) {
-        orthodonticRecordValidation.requireNonNull(id, "Record ID cannot be null");
+        orthodonticRecordValidation.requireNonNullId(id);
         orthodonticRecordValidation.validateRecordAccess(id);
 
         orthodonticRecordRepository.deleteById(id);

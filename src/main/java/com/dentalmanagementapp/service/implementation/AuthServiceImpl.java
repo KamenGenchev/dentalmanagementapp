@@ -1,6 +1,6 @@
 package com.dentalmanagementapp.service.implementation;
 
-import com.dentalmanagementapp.dtos.dentist.DentistRegisterDto;
+import com.dentalmanagementapp.dtos.auth.DentistRegisterDto;
 import com.dentalmanagementapp.dtos.auth.LoginDto;
 import com.dentalmanagementapp.dtos.auth.LoginResponseDto;
 import com.dentalmanagementapp.security.JwtUtil;

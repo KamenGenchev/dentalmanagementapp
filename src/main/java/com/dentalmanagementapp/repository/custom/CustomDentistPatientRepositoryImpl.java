@@ -14,13 +14,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Repository
+@Transactional
 public class CustomDentistPatientRepositoryImpl implements CustomDentistPatientRepository {
     private final FilterUtil filterUtil;
 
@@ -47,6 +47,9 @@ public class CustomDentistPatientRepositoryImpl implements CustomDentistPatientR
 
     @Override
     public boolean patientExistsForDentist(String email) {
+        if (email == null) {
+            throw new IllegalArgumentException("Email cannot be null");
+        }
         configureFilter();
 
         TypedQuery<Long> query = entityManager.createQuery(

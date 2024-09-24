@@ -59,9 +59,8 @@ public class CustomDentistPatientRepositoryImpl implements CustomDentistPatientR
     public Page<DentistPatient> searchPatientsByName(String firstName, String lastName, Pageable pageable) {
         configureFilter();
 
-        StringBuilder queryBuilder = new StringBuilder("SELECT dp FROM DentistPatient dp WHERE");
         Map<String, String> params = new HashMap<>();
-        String queryString = appendClauses(queryBuilder, params, firstName, lastName);
+        String queryString = appendClauses(params, firstName, lastName);
 
         TypedQuery<DentistPatient> query = entityManager.createQuery(queryString, DentistPatient.class);
 
@@ -85,7 +84,8 @@ public class CustomDentistPatientRepositoryImpl implements CustomDentistPatientR
         return new PageImpl<>(resultList, pageable, total);
     }
 
-    private String appendClauses(final StringBuilder queryBuilder, final Map<String, String> params, final String firstName, final String lastName) {
+    private String appendClauses(final Map<String, String> params, final String firstName, final String lastName) {
+        StringBuilder queryBuilder = new StringBuilder("SELECT dp FROM DentistPatient dp WHERE");
         boolean moreThanOneClause = false;
 
         if (firstName != null && !firstName.isEmpty()) {

@@ -2,7 +2,7 @@ package com.dentalmanagementapp.service.implementation;
 
 import com.dentalmanagementapp.dtos.dentist.DentistDetailsDto;
 import com.dentalmanagementapp.dtos.dentist.DentistDto;
-import com.dentalmanagementapp.dtos.dentist.DentistRegisterDto;
+import com.dentalmanagementapp.dtos.auth.DentistRegisterDto;
 import com.dentalmanagementapp.entities.Dentist;
 import com.dentalmanagementapp.exception.custom.NotFoundException;
 import com.dentalmanagementapp.mappers.DentistMapper;
@@ -36,7 +36,7 @@ public class DentistServiceImpl implements DentistService {
     @Override
     @Transactional
     public void registerDentist(@Valid DentistRegisterDto dto) {
-        dentistValidation.assertDoesNotExistByEmail(dto.email());
+        dentistValidation.validateEmailUniqueness(dto.email());
         Dentist dentist = dentistMapper.fromRegisteringDto(dto);
 
         dentistRepository.save(dentist);
@@ -45,7 +45,7 @@ public class DentistServiceImpl implements DentistService {
     @Override
     @Transactional
     public Long createDentist(@Valid DentistDto dto) {
-        dentistValidation.assertDoesNotExistByEmail(dto.email());
+        dentistValidation.validateEmailUniqueness(dto.email());
         Dentist dentist = dentistMapper.fromAdminDto(dto);
 
         dentistRepository.save(dentist);
@@ -78,7 +78,7 @@ public class DentistServiceImpl implements DentistService {
                 .orElseThrow(() -> new NotFoundException("Dentist with id: " + id + " was not found"));
 
         if (!Objects.equals(dentist.getEmail(), dto.email())) {
-            dentistValidation.assertDoesNotExistByEmail(dto.email());
+            dentistValidation.validateEmailUniqueness(dto.email());
         }
 
         dentist.updateInformation(dto.firstName(), dto.lastName(), dto.email());
@@ -89,7 +89,7 @@ public class DentistServiceImpl implements DentistService {
     @Transactional
     public void deleteDentist(Long id) {
         dentistValidation.requireNonNull(id, "Dentist ID cannot be null");
-        dentistValidation.assertExistsById(id);
+        dentistValidation.validateDentistExists(id);
 
         dentistRepository.deleteById(id);
     }

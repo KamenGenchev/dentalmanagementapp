@@ -7,6 +7,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,51 +61,35 @@ public class CustomDentistPatientRepositoryImpl implements CustomDentistPatientR
     public Page<DentistPatient> searchPatientsByName(String firstName, String lastName, Pageable pageable) {
         configureFilter();
 
-        Map<String, String> params = new HashMap<>();
-        String queryString = appendClauses(params, firstName, lastName);
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<DentistPatient> query = cb.createQuery(DentistPatient.class);
+        Root<DentistPatient> root = query.from(DentistPatient.class);
 
-        TypedQuery<DentistPatient> query = entityManager.createQuery(queryString, DentistPatient.class);
+        List<Predicate> predicates = new ArrayList<>();
 
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            query.setParameter(entry.getKey(), entry.getValue());
+        if (firstName != null && !firstName.isEmpty()) {
+            predicates.add(cb.like(root.get("patient").get("firstName"), "%" + firstName + "%"));
         }
-
-        query.setFirstResult((int) pageable.getOffset());
-        query.setMaxResults(pageable.getPageSize());
-        List<DentistPatient> resultList = query.getResultList();
-
-        String countQueryString = queryString.replace("SELECT dp", "SELECT COUNT(dp)");
-        TypedQuery<Long> countQuery = entityManager.createQuery(countQueryString, Long.class);
-
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            countQuery.setParameter(entry.getKey(), entry.getValue());
+        if (lastName != null && !lastName.isEmpty()) {
+            predicates.add(cb.like(root.get("patient").get("lastName"), "%" + lastName + "%"));
         }
+        query.select(root).where(predicates.toArray(new Predicate[0]));
 
-        long total = countQuery.getSingleResult();
+        TypedQuery<DentistPatient> typedQuery = entityManager.createQuery(query);
+        typedQuery.setFirstResult((int) pageable.getOffset());
+        typedQuery.setMaxResults(pageable.getPageSize());
+        List<DentistPatient> resultList = typedQuery.getResultList();
+
+
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        countQuery.select(cb.count(countQuery.from(DentistPatient.class)))
+                .where(predicates.toArray(new Predicate[0]));
+        long total = entityManager.createQuery(countQuery).getSingleResult();
+
 
         return new PageImpl<>(resultList, pageable, total);
     }
 
-    private String appendClauses(final Map<String, String> params, final String firstName, final String lastName) {
-        StringBuilder queryBuilder = new StringBuilder("SELECT dp FROM DentistPatient dp WHERE");
-        boolean moreThanOneClause = false;
-
-        if (firstName != null && !firstName.isEmpty()) {
-            queryBuilder.append(" dp.patient.firstName LIKE :firstName");
-            moreThanOneClause = true;
-            params.put("firstName", "%" + firstName + "%");
-        }
-
-        if (lastName != null && !lastName.isEmpty()) {
-            if (moreThanOneClause) {
-                queryBuilder.append(" AND ");
-            }
-            queryBuilder.append(" dp.patient.lastName LIKE :lastName");
-            params.put("lastName", "%" + lastName + "%");
-        }
-
-        return queryBuilder.toString();
-    }
 
     private void configureFilter() {
         filterUtil.configureFilter(entityManager);

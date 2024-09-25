@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.List;
 @Configuration
@@ -33,7 +34,7 @@ public class SecurityConfig {
                         .requestMatchers("api/patient/**").hasRole("PATIENT")
                         .requestMatchers("api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
-                ).addFilterBefore(jwtRequestFilter, JwtRequestFilter.class);
+                ).addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
 }

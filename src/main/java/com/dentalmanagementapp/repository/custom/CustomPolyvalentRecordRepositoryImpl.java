@@ -37,11 +37,11 @@ public class CustomPolyvalentRecordRepositoryImpl implements CustomPolyvalentRec
         configureFilter();
 
         TypedQuery<PolyvalentRecord> query = entityManager.createQuery(
-                "SELECT o FROM PolyvalentRecord o WHERE o.id = :id",
+                "SELECT p FROM PolyvalentRecord p WHERE p.id = :id",
                 PolyvalentRecord.class);
         query.setParameter("id", id);
 
-        return query.getResultList().stream().findFirst();
+        return query.getResultStream().findFirst();
     }
 
     @Override
@@ -49,10 +49,10 @@ public class CustomPolyvalentRecordRepositoryImpl implements CustomPolyvalentRec
         configureFilter();
 
         TypedQuery<Long> query = entityManager.createQuery(
-                "SELECT EXISTS(SELECT 1 FROM PolyvalentRecord o WHERE o.id = :id)", Long.class);
+                "SELECT COUNT(p) FROM PolyvalentRecord p WHERE p.id = :id", Long.class);
         query.setParameter("id", id);
-        Long count = query.getSingleResult();
-        return count > 0;
+
+        return query.getSingleResult() > 0;
     }
 
     private void configureFilter(){

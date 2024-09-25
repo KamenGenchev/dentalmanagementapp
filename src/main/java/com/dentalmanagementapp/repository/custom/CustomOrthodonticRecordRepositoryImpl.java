@@ -41,17 +41,18 @@ public class CustomOrthodonticRecordRepositoryImpl implements CustomOrthodonticR
                 OrthodonticRecord.class);
         query.setParameter("id", id);
 
-        return query.getResultList().stream().findFirst();
+        return query.getResultStream().findFirst();
     }
 
     @Override
     public boolean existsByIdWithOwnership(Long id) {
         configureFilter();
 
-        TypedQuery<Boolean> query = entityManager.createQuery(
-                "SELECT EXISTS (SELECT 1 FROM OrthodonticRecord o WHERE o.id = :id)", Boolean.class);
+        TypedQuery<Long> query = entityManager.createQuery(
+                "SELECT COUNT(o) FROM OrthodonticRecord o WHERE o.id = :id", Long.class);
         query.setParameter("id", id);
-        return query.getSingleResult();
+
+        return query.getSingleResult() > 0;
     }
 
     private void configureFilter() {

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @Transactional
@@ -47,9 +48,6 @@ public class CustomDentistPatientRepositoryImpl implements CustomDentistPatientR
 
     @Override
     public boolean patientExistsForDentist(String email) {
-        if (email == null) {
-            throw new IllegalArgumentException("Email cannot be null");
-        }
         configureFilter();
 
         TypedQuery<Long> query = entityManager.createQuery(
@@ -93,6 +91,18 @@ public class CustomDentistPatientRepositoryImpl implements CustomDentistPatientR
         return new PageImpl<>(resultList, pageable, total);
     }
 
+    @Override
+    public Optional<DentistPatient> findPatientByLocalId(short localId) {
+        configureFilter();
+
+        TypedQuery<DentistPatient> query = entityManager.createQuery(
+                "SELECT dp FROM DentistPatient dp WHERE dp.localId = :localId",
+                DentistPatient.class);
+
+        query.setParameter("localId", localId);
+
+        return query.getResultStream().findFirst();
+    }
 
     private void configureFilter() {
         filterUtil.configureFilter(entityManager);

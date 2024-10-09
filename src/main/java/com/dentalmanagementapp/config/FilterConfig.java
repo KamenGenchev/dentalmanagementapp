@@ -1,4 +1,4 @@
-package com.dentalmanagementapp.util;
+package com.dentalmanagementapp.config;
 
 import com.dentalmanagementapp.security.CurrentUser;
 import com.dentalmanagementapp.security.UserContext;
@@ -7,7 +7,7 @@ import org.hibernate.Session;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FilterUtil {
+public class FilterConfig {
 
     public void configureFilter(EntityManager entityManager) {
         Session session = entityManager.unwrap(Session.class);

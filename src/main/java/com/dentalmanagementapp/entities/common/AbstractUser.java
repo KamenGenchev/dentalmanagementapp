@@ -9,32 +9,54 @@ import java.util.Objects;
 @SoftDelete
 public abstract class AbstractUser {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    protected Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    protected boolean deleted;
+    @Version
+    private int version;
+
+    @Column(insertable = false, updatable = false)
+    private boolean deleted;
 
     @Column(nullable = false, length = 50)
-    protected String firstName;
+    private String firstName;
 
     @Column(nullable = false, length = 50)
-    protected String lastName;
+    private String lastName;
 
     @Column(unique = true, length = 200, nullable = false)
-    protected String email;
-    @Column(nullable = false, length = 30)
-    protected String password;
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
 
     protected AbstractUser() {
     }
 
-    protected AbstractUser(String firstName, String lastName, String email) {
+    protected AbstractUser(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.password = password;
     }
 
-    public String getUsername() {
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getEmail() {
         return email;
     }
 
@@ -42,28 +64,16 @@ public abstract class AbstractUser {
         this.email = email;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
     public Long getId() {
         return id;
     }
 
-    public String getPassword() {
-        return password;
+    public String getUsername() {
+        return email;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public String getPassword() {
+        return password;
     }
 
     public String getRole() {

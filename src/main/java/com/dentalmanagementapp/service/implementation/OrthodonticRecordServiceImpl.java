@@ -1,5 +1,6 @@
 package com.dentalmanagementapp.service.implementation;
 
+import com.dentalmanagementapp.dtos.record.OrthodonticRecordCreateDto;
 import com.dentalmanagementapp.dtos.record.OrthodonticRecordDto;
 import com.dentalmanagementapp.dtos.record.OrthodonticRecordUpdateDto;
 import com.dentalmanagementapp.entities.OrthodonticRecord;
@@ -42,6 +43,14 @@ public class OrthodonticRecordServiceImpl implements OrthodonticRecordService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<OrthodonticRecordDto> getAllRecordsForPatient(short localPatientId) {
+        return orthodonticRecordRepository.findAllWithFilter(localPatientId).stream()
+                .map(orthodonticRecordMapper::toDto)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public OrthodonticRecordDto getRecord(Long id) {
         orthodonticRecordValidation.requireNonNullId(id);
 
@@ -51,7 +60,7 @@ public class OrthodonticRecordServiceImpl implements OrthodonticRecordService {
     }
 
     @Override
-    public Long saveRecord(@Valid OrthodonticRecordDto recordDto) {
+    public Long saveRecord(@Valid OrthodonticRecordCreateDto recordDto) {
         OrthodonticRecord record = orthodonticRecordMapper.toEntity(recordDto);
         return orthodonticRecordRepository.save(record).getId();
     }

@@ -7,18 +7,12 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-public class OrthodonticRecordValidation {
+public class OrthodonticRecordValidation extends RecordValidation {
     private final OrthodonticRecordRepository orthodonticRecordRepository;
 
     @Autowired
-    public OrthodonticRecordValidation(OrthodonticRecordRepository orthodonticRecordRepository) {
-        this.orthodonticRecordRepository = orthodonticRecordRepository;
-    }
-
-    public void requireNonNull(Object o, String message) {
-        if (o == null) {
-            throw new IllegalArgumentException(message);
-        }
+    public OrthodonticRecordValidation(OrthodonticRecordRepository orthodonticRecordRepository1) {
+        this.orthodonticRecordRepository = orthodonticRecordRepository1;
     }
 
     public void validateRecordAccess(Long id) {

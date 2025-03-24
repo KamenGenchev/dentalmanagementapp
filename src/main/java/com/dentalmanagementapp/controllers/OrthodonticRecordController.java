@@ -1,7 +1,9 @@
 package com.dentalmanagementapp.controllers;
 
+import com.dentalmanagementapp.dtos.record.OrthodonticRecordCreateDto;
 import com.dentalmanagementapp.dtos.record.OrthodonticRecordDto;
 import com.dentalmanagementapp.dtos.record.OrthodonticRecordUpdateDto;
+import com.dentalmanagementapp.service.OrthodonticRecordService;
 import com.dentalmanagementapp.service.implementation.OrthodonticRecordServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +36,14 @@ public class OrthodonticRecordController {
         return ResponseEntity.ok(record);
     }
 
+    @GetMapping("/patient/{patientLocalId}")
+    public ResponseEntity<List<OrthodonticRecordDto>> getOrthodonticRecordsForPatient(@PathVariable("patientLocalId") short patientLocalId) {
+        List<OrthodonticRecordDto> records = recordService.getAllRecordsForPatient(patientLocalId);
+        return ResponseEntity.ok(records);
+    }
+
     @PostMapping()
-    public ResponseEntity<OrthodonticRecordDto> createOrthodonticRecord(@Valid @RequestBody OrthodonticRecordDto record) {
+    public ResponseEntity<OrthodonticRecordDto> createOrthodonticRecord(@Valid @RequestBody OrthodonticRecordCreateDto record) {
         Long newRecordId = recordService.saveRecord(record);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")

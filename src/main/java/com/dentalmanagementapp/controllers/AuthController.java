@@ -24,8 +24,9 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<Object> registerDentistAndLogin(@Valid @RequestBody DentistRegisterDto dto) {
         authService.registerDentist(dto);
-        LoginDto loginDto = new LoginDto(dto.email(), dto.password());
-        return login(loginDto);
+        return ResponseEntity.ok().build();
+//        LoginDto loginDto = new LoginDto(dto.email(), dto.password());
+//        return login(loginDto);
     }
 
     @PostMapping("/login")

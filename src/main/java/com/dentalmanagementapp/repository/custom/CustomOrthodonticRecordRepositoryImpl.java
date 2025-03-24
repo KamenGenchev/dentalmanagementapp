@@ -1,7 +1,7 @@
 package com.dentalmanagementapp.repository.custom;
 
 import com.dentalmanagementapp.entities.OrthodonticRecord;
-import com.dentalmanagementapp.util.FilterUtil;
+import com.dentalmanagementapp.config.FilterConfig;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -16,11 +16,11 @@ public class CustomOrthodonticRecordRepositoryImpl implements CustomOrthodonticR
     @PersistenceContext
     private EntityManager entityManager;
 
-    private final FilterUtil filterUtil;
+    private final FilterConfig filterConfig;
 
     @Autowired
-    public CustomOrthodonticRecordRepositoryImpl(FilterUtil filterUtil) {
-        this.filterUtil = filterUtil;
+    public CustomOrthodonticRecordRepositoryImpl(FilterConfig filterConfig) {
+        this.filterConfig = filterConfig;
     }
 
     @Override
@@ -29,6 +29,18 @@ public class CustomOrthodonticRecordRepositoryImpl implements CustomOrthodonticR
 
         TypedQuery<OrthodonticRecord> query = entityManager.createQuery(
                 "FROM OrthodonticRecord", OrthodonticRecord.class);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<OrthodonticRecord> findAllWithFilter(short localPatientId) {
+        configureFilter();
+
+        TypedQuery<OrthodonticRecord> query = entityManager.createQuery(
+                "SELECT o FROM OrthodonticRecord o WHERE o.dentistPatient.localId = :localPatientId",
+                OrthodonticRecord.class);
+        query.setParameter("localPatientId", localPatientId);
+
         return query.getResultList();
     }
 
@@ -56,7 +68,7 @@ public class CustomOrthodonticRecordRepositoryImpl implements CustomOrthodonticR
     }
 
     private void configureFilter() {
-        filterUtil.configureFilter(entityManager);
+        filterConfig.configureFilter(entityManager);
     }
 
 

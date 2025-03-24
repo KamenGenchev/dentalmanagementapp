@@ -1,6 +1,7 @@
 package com.dentalmanagementapp.mappers;
 
 import com.dentalmanagementapp.dtos.dentistpatient.PatientForDentistDto;
+import com.dentalmanagementapp.dtos.record.OrthodonticRecordCreateDto;
 import com.dentalmanagementapp.dtos.record.OrthodonticRecordDto;
 import com.dentalmanagementapp.dtos.record.OrthodonticRecordUpdateDto;
 import com.dentalmanagementapp.entities.DentistPatient;
@@ -28,7 +29,7 @@ public class OrthodonticRecordMapper {
         return new OrthodonticRecordDto(patientDto, entity.getDescription(), entity.getRecordDate());
     }
 
-    public OrthodonticRecord toEntity(OrthodonticRecordDto dto) {
+    public OrthodonticRecord toEntity(OrthodonticRecordCreateDto dto) {
         DentistPatient dentistPatient = dentistPatientService.getDentistPatientByPatientLocalId(dto.patientDto().localId());
 
         return new OrthodonticRecord(dentistPatient, dto.description());

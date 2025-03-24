@@ -10,6 +10,5 @@ public interface CustomDentistPatientRepository {
     short findNextLocalIdForDentist();
     boolean patientExistsForDentist(String email);
     Page<DentistPatient> searchPatientsByName(String firstName, String lastName, Pageable pageable);
-
     Optional<DentistPatient> findPatientByLocalId(short localId);
 }

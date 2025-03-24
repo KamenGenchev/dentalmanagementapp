@@ -1,8 +1,17 @@
 package com.dentalmanagementapp.service;
 
-import org.springframework.stereotype.Service;
+import com.dentalmanagementapp.dtos.dentist.DentistDetailsDto;
+import com.dentalmanagementapp.dtos.dentist.DentistDto;
+import com.dentalmanagementapp.dtos.auth.DentistRegisterDto;
+import jakarta.validation.Valid;
 
-@Service
-public class DentistService {
+import java.util.List;
 
+public interface DentistService {
+    void registerDentist(@Valid DentistRegisterDto dto);
+    Long createDentist(@Valid DentistDto dentistDto);
+    DentistDetailsDto getDentistById(Long id);
+    List<DentistDto> getAllDentists();
+    void updateDentist(Long id, @Valid DentistDto dentistDto);
+    void deleteDentist(Long id);
 }

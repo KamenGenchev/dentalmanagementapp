@@ -1,11 +1,10 @@
 package com.dentalmanagementapp.security;
 
+import com.dentalmanagementapp.util.SecurityUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,32 +19,38 @@ import java.io.IOException;
 public class JwtRequestFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final CustomUserDetailService customUserDetailService;
+    private final SecurityUtil securityUtil;
 
     @Autowired
-    public JwtRequestFilter(@NotNull JwtUtil jwtUtil, @NotNull CustomUserDetailService customUserDetailService) {
+    public JwtRequestFilter(JwtUtil jwtUtil, CustomUserDetailService customUserDetailService, SecurityUtil securityUtil) {
         this.jwtUtil = jwtUtil;
         this.customUserDetailService = customUserDetailService;
+        this.securityUtil = securityUtil;
     }
 
-    @Transactional
     @Override
-    protected void doFilterInternal(final @NotNull HttpServletRequest request, final @NotNull HttpServletResponse response, final @NotNull FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             validateRequestToken(request);
-        } catch (Exception ex) {
-            //TODO
+            filterChain.doFilter(request, response);
+        } finally {
+            UserContext.clear();
         }
-        filterChain.doFilter(request, response);
     }
 
-    @Transactional
     protected void validateRequestToken(HttpServletRequest request) {
-        String authToken = jwtUtil.generateToken(String.valueOf(request));
-        if (authToken != null) {
+        String authHeader = request.getHeader("Authorization");
+        System.out.println("Auth header: " + authHeader);
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String authToken = authHeader.substring(7);
+            System.out.println("Auth token: " + authToken);
             String username = jwtUtil.getUsername(authToken);
-            if (username != null) {
+
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = customUserDetailService.loadUserByUsername(username);
                 authenticationProcedure(authToken, userDetails, request);
+                UserContext.setCurrentUser(securityUtil.getCurrentUserContext());
             }
         }
     }

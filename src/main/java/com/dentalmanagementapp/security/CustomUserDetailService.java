@@ -1,35 +1,35 @@
 package com.dentalmanagementapp.security;
 
-import com.dentalmanagementapp.repository.DentistRepository;
-import com.dentalmanagementapp.repository.PatientRepository;
+import com.dentalmanagementapp.entities.common.AbstractUser;
+import com.dentalmanagementapp.repository.IUserRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class CustomUserDetailService implements UserDetailsService {
-    private final DentistRepository dentistRepository;
-    private final PatientRepository patientRepository;
+    private final List<IUserRepository> userRepositories;
 
     @Autowired
-    public CustomUserDetailService(@NotNull DentistRepository dentistRepository, @NotNull PatientRepository patientRepository) {
-        this.dentistRepository = dentistRepository;
-        this.patientRepository = patientRepository;
+    public CustomUserDetailService(List<IUserRepository> userRepositories) {
+        this.userRepositories = userRepositories;
     }
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return dentistRepository.findByEmail(username)
-                .map(CustomUserDetails::new)
-                .orElseGet(() -> patientRepository.findByUsername(username)
-                        .map(CustomUserDetails::new)
-                        .orElseThrow(() ->
-                                new UsernameNotFoundException(
-                                        String.format("User with username: %s could not be found", username)
-                                )
-                        )
-                );
+    public UserDetails loadUserByUsername(String email) {
+        for (IUserRepository repository : userRepositories) {
+            Optional<? extends AbstractUser> user = repository.findByEmail(email);
+            if (user.isPresent()) {
+                return new CustomUserDetails(user.get());
+            }
+        }
+        throw new UsernameNotFoundException(
+                String.format("User with email: %s could not be found", email)
+        );
     }
 }

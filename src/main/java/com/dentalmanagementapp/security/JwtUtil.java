@@ -13,14 +13,15 @@ import java.util.Date;
 @Component
 
 public class JwtUtil {
-    @Value("${SECRET_KEY}") //check if works
+    @Value("${jwtKey}")
     private String secretKey;
+    private static final long EXPIRATION_TIME = 10 * 60 * 1000000;
 
     public String generateToken(String email) {
         return JWT.create()
                 .withSubject(email)
                 .withIssuedAt(new Date(System.currentTimeMillis()))
-                .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .sign(Algorithm.HMAC384(secretKey));
     }
 
@@ -34,6 +35,10 @@ public class JwtUtil {
 
     public boolean isTokenValid(String token, UserDetails details) {
         var username = getDecodedJwt(token).getSubject();
+        //todo temp
+        boolean isExpired = isTokenExpired(token);
+        System.out.println("Validating token for user: " + username + " with details: " + details.getUsername() + ", isExpired: " + isExpired);
+        //
         return username.equals(details.getUsername()) && !isTokenExpired(token);
     }
 

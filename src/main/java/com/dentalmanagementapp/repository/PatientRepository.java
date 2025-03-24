@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface PatientRepository extends JpaRepository<Patient,Long> {
-    Optional<Patient> findByUsername(String username);
+public interface PatientRepository extends JpaRepository<Patient,Long>, IUserRepository {
+    @Override
+    Optional<Patient> findByEmail(String email);
+
 }

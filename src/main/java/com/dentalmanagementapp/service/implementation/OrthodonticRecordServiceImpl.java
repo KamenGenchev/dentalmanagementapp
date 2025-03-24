@@ -1,0 +1,88 @@
+package com.dentalmanagementapp.service.implementation;
+
+import com.dentalmanagementapp.dtos.record.OrthodonticRecordCreateDto;
+import com.dentalmanagementapp.dtos.record.OrthodonticRecordDto;
+import com.dentalmanagementapp.dtos.record.OrthodonticRecordUpdateDto;
+import com.dentalmanagementapp.entities.OrthodonticRecord;
+import com.dentalmanagementapp.exception.custom.NotFoundException;
+import com.dentalmanagementapp.mappers.OrthodonticRecordMapper;
+import com.dentalmanagementapp.repository.OrthodonticRecordRepository;
+import com.dentalmanagementapp.service.OrthodonticRecordService;
+import com.dentalmanagementapp.validation.OrthodonticRecordValidation;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@Validated
+public class OrthodonticRecordServiceImpl implements OrthodonticRecordService {
+    private final OrthodonticRecordRepository orthodonticRecordRepository;
+    private final OrthodonticRecordMapper orthodonticRecordMapper;
+    private final OrthodonticRecordValidation orthodonticRecordValidation;
+
+    @Autowired
+    public OrthodonticRecordServiceImpl(OrthodonticRecordRepository orthodonticRecordRepository, OrthodonticRecordMapper orthodonticRecordMapper, OrthodonticRecordValidation orthodonticRecordValidation) {
+        this.orthodonticRecordRepository = orthodonticRecordRepository;
+        this.orthodonticRecordMapper = orthodonticRecordMapper;
+        this.orthodonticRecordValidation = orthodonticRecordValidation;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrthodonticRecordDto> getAllRecords() {
+        return orthodonticRecordRepository.findAllWithFilter().stream()
+                .map(orthodonticRecordMapper::toDto)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrthodonticRecordDto> getAllRecordsForPatient(short localPatientId) {
+        return orthodonticRecordRepository.findAllWithFilter(localPatientId).stream()
+                .map(orthodonticRecordMapper::toDto)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public OrthodonticRecordDto getRecord(Long id) {
+        orthodonticRecordValidation.requireNonNullId(id);
+
+        return orthodonticRecordRepository.findOrthodonticRecordWithAccess(id)
+                .map(orthodonticRecordMapper::toDto)
+                .orElseThrow(() -> new NotFoundException("Orthodontic record with id: " + id + " was not found"));
+    }
+
+    @Override
+    public Long saveRecord(@Valid OrthodonticRecordCreateDto recordDto) {
+        OrthodonticRecord record = orthodonticRecordMapper.toEntity(recordDto);
+        return orthodonticRecordRepository.save(record).getId();
+    }
+
+    @Override
+    @Transactional
+    public void updateRecord(Long id, @Valid OrthodonticRecordUpdateDto recordUpdateDto) {
+        orthodonticRecordValidation.requireNonNullId(id);
+
+        OrthodonticRecord record = orthodonticRecordRepository.findOrthodonticRecordWithAccess(id)
+                .orElseThrow(() -> new NotFoundException("Orthodontic record with id: " + id + " was not found"));
+
+        record = orthodonticRecordMapper.toEntity(recordUpdateDto, record);
+        orthodonticRecordRepository.save(record);
+    }
+
+    @Override
+    @Transactional
+    public void deleteRecord(Long id) {
+        orthodonticRecordValidation.requireNonNullId(id);
+        orthodonticRecordValidation.validateRecordAccess(id);
+
+        orthodonticRecordRepository.deleteById(id);
+    }
+}

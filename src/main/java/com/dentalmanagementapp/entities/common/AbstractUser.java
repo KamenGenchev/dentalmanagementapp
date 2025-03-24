@@ -1,24 +1,43 @@
 package com.dentalmanagementapp.entities.common;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.SoftDelete;
+
+import java.util.Objects;
+
 @MappedSuperclass
+@SoftDelete
 public abstract class AbstractUser {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    protected Long id;
-    protected String firstName;
-    protected String lastName;
-    @Column(unique = true)
-    protected String email;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    protected String password;
+    @Version
+    private int version;
 
-    public String getUsername() {
-        return email;
+    @Column(insertable = false, updatable = false)
+    private boolean deleted;
+
+    @Column(nullable = false, length = 50)
+    private String firstName;
+
+    @Column(nullable = false, length = 50)
+    private String lastName;
+
+    @Column(unique = true, length = 200, nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    protected AbstractUser() {
     }
 
-    public void setEmail(String email) {
+    protected AbstractUser(String firstName, String lastName, String email, String password) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
+        this.password = password;
     }
 
     public String getFirstName() {
@@ -37,19 +56,40 @@ public abstract class AbstractUser {
         this.lastName = lastName;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public Long getId() {
         return id;
+    }
+
+    public String getUsername() {
+        return email;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getRole() {
         return "";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AbstractUser that)) return false;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(email, that.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, email);
     }
 }

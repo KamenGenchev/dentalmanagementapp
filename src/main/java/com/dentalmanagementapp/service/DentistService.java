@@ -1,17 +1,17 @@
 package com.dentalmanagementapp.service;
 
-import com.dentalmanagementapp.dtos.DentistRegisterDto;
-import com.dentalmanagementapp.entities.Dentist;
+import com.dentalmanagementapp.dtos.dentist.DentistDetailsDto;
+import com.dentalmanagementapp.dtos.dentist.DentistDto;
+import com.dentalmanagementapp.dtos.auth.DentistRegisterDto;
+import jakarta.validation.Valid;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface DentistService {
-    Optional<Dentist> findByEmail(String email);
-    void registerDentist(DentistRegisterDto dto);
-    Dentist createDentist(Dentist dentist);
-    Optional<Dentist> getDentistById(Long id);
-    List<Dentist> getAllDentists();
-    Dentist updateDentist(Long id, Dentist dentist);
+    void registerDentist(@Valid DentistRegisterDto dto);
+    Long createDentist(@Valid DentistDto dentistDto);
+    DentistDetailsDto getDentistById(Long id);
+    List<DentistDto> getAllDentists();
+    void updateDentist(Long id, @Valid DentistDto dentistDto);
     void deleteDentist(Long id);
 }

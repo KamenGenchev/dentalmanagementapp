@@ -1,7 +1,7 @@
 package com.dentalmanagementapp.repository.custom;
 
 import com.dentalmanagementapp.entities.PolyvalentRecord;
-import com.dentalmanagementapp.util.FilterUtil;
+import com.dentalmanagementapp.config.FilterConfig;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -16,11 +16,11 @@ public class CustomPolyvalentRecordRepositoryImpl implements CustomPolyvalentRec
     @PersistenceContext
     private EntityManager entityManager;
 
-    private final FilterUtil filterUtil;
+    private final FilterConfig filterConfig;
 
     @Autowired
-    public CustomPolyvalentRecordRepositoryImpl(FilterUtil filterUtil) {
-        this.filterUtil = filterUtil;
+    public CustomPolyvalentRecordRepositoryImpl(FilterConfig filterConfig) {
+        this.filterConfig = filterConfig;
     }
 
     @Override
@@ -56,6 +56,6 @@ public class CustomPolyvalentRecordRepositoryImpl implements CustomPolyvalentRec
     }
 
     private void configureFilter(){
-        filterUtil.configureFilter(entityManager);
+        filterConfig.configureFilter(entityManager);
     }
 }

@@ -15,7 +15,7 @@ import java.util.Date;
 public class JwtUtil {
     @Value("${jwtKey}")
     private String secretKey;
-    private static final long EXPIRATION_TIME = 10 * 60 * 1000;
+    private static final long EXPIRATION_TIME = 10 * 60 * 1000000;
 
     public String generateToken(String email) {
         return JWT.create()
@@ -35,6 +35,10 @@ public class JwtUtil {
 
     public boolean isTokenValid(String token, UserDetails details) {
         var username = getDecodedJwt(token).getSubject();
+        //todo temp
+        boolean isExpired = isTokenExpired(token);
+        System.out.println("Validating token for user: " + username + " with details: " + details.getUsername() + ", isExpired: " + isExpired);
+        //
         return username.equals(details.getUsername()) && !isTokenExpired(token);
     }
 

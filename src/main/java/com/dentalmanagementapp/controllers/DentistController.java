@@ -2,8 +2,6 @@ package com.dentalmanagementapp.controllers;
 
 import com.dentalmanagementapp.dtos.dentist.DentistDetailsDto;
 import com.dentalmanagementapp.dtos.dentist.DentistDto;
-import com.dentalmanagementapp.dtos.patient.PatientAddDto;
-import com.dentalmanagementapp.service.DentistPatientService;
 import com.dentalmanagementapp.service.DentistService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +15,10 @@ import static com.dentalmanagementapp.security.UserContext.getCurrentUser;
 @RequestMapping("/api/dentists")
 public class DentistController {
     private final DentistService dentistService;
-    private final DentistPatientService dentistPatientService;
 
     @Autowired
-    public DentistController(DentistService dentistService, DentistPatientService dentistPatientService) {
+    public DentistController(DentistService dentistService) {
         this.dentistService = dentistService;
-        this.dentistPatientService = dentistPatientService;
     }
 
     @GetMapping()
@@ -37,9 +33,4 @@ public class DentistController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping("/add-patient")
-    public ResponseEntity<Void> addNewPatientToDentist(@Valid @RequestBody PatientAddDto patientDto) {
-        dentistPatientService.createPatientWithDentist(patientDto, getCurrentUser().currentUserId());
-        return ResponseEntity.noContent().build();
-    }
 }

@@ -2,7 +2,7 @@ package com.dentalmanagementapp.validation;
 
 public abstract class RecordValidation{
 
-    public void requireNonNull(Long id) {
+    public void requireNonNullId(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("Record ID cannot be null");
         }

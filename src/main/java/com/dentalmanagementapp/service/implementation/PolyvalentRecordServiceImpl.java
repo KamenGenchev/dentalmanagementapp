@@ -1,6 +1,7 @@
 package com.dentalmanagementapp.service.implementation;
 
-import com.dentalmanagementapp.dtos.record.PolyvalentRecordUpdateDto;
+import com.dentalmanagementapp.dtos.PolyvalentRecordUpdateDto;
+import com.dentalmanagementapp.dtos.record.PolyvalentRecordDto;
 import com.dentalmanagementapp.entities.PolyvalentRecord;
 import com.dentalmanagementapp.exception.custom.NotFoundException;
 import com.dentalmanagementapp.mappers.PolyvalentRecordMapper;
@@ -32,7 +33,7 @@ public class PolyvalentRecordServiceImpl implements PolyvalentRecordService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<PolyvalentRecordUpdateDto> getAllRecords() {
+    public List<PolyvalentRecordDto> getAllRecords() {
         return polyvalentRecordRepository.findAllWithFilter().stream()
                 .map(polyvalentRecordMapper::toDto)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
@@ -40,7 +41,7 @@ public class PolyvalentRecordServiceImpl implements PolyvalentRecordService {
 
     @Override
     @Transactional(readOnly = true)
-    public PolyvalentRecordUpdateDto getRecord(Long id) {
+    public PolyvalentRecordDto getRecord(Long id) {
         polyvalentRecordValidation.requireNonNullId(id);
         return polyvalentRecordRepository.findPolyvalentRecordWithAccess(id)
                 .map(polyvalentRecordMapper::toDto)
@@ -48,10 +49,11 @@ public class PolyvalentRecordServiceImpl implements PolyvalentRecordService {
     }
 
     @Override
-    public Long saveRecord(@Valid PolyvalentRecordUpdateDto recordDto) {
+    public Long saveRecord(@Valid PolyvalentRecordDto recordDto) {
         PolyvalentRecord record = polyvalentRecordMapper.toEntity(recordDto);
         return polyvalentRecordRepository.save(record).getId();
     }
+
 
     @Override
     @Transactional

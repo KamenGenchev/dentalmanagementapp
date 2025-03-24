@@ -1,7 +1,7 @@
 package com.dentalmanagementapp.repository.custom;
 
 import com.dentalmanagementapp.entities.DentistPatient;
-import com.dentalmanagementapp.util.FilterUtil;
+import com.dentalmanagementapp.config.FilterConfig;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -23,14 +23,14 @@ import java.util.Optional;
 @Repository
 @Transactional
 public class CustomDentistPatientRepositoryImpl implements CustomDentistPatientRepository {
-    private final FilterUtil filterUtil;
+    private final FilterConfig filterConfig;
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Autowired
-    public CustomDentistPatientRepositoryImpl(FilterUtil filterUtil) {
-        this.filterUtil = filterUtil;
+    public CustomDentistPatientRepositoryImpl(FilterConfig filterConfig) {
+        this.filterConfig = filterConfig;
     }
 
     @Override
@@ -40,7 +40,7 @@ public class CustomDentistPatientRepositoryImpl implements CustomDentistPatientR
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Short> query = cb.createQuery(Short.class);
         Root<DentistPatient> root = query.from(DentistPatient.class);
-        query.select(cb.coalesce(cb.greatest(root.get("localId")), cb.literal((short) 0)));
+        query.select(cb.coalesce(cb.max(root.get("localId")), cb.literal((short) 0)));
 
         Short maxLocalId = entityManager.createQuery(query).getSingleResult();
         return (short) (maxLocalId + 1);
@@ -55,7 +55,7 @@ public class CustomDentistPatientRepositoryImpl implements CustomDentistPatientR
                 Long.class);
         query.setParameter("email", email);
 
-        return query.getSingleResult() > 0;
+        return query.getSingleResult() > 0; //err
     }
 
     @Override
@@ -105,6 +105,6 @@ public class CustomDentistPatientRepositoryImpl implements CustomDentistPatientR
     }
 
     private void configureFilter() {
-        filterUtil.configureFilter(entityManager);
+        filterConfig.configureFilter(entityManager);
     }
 }

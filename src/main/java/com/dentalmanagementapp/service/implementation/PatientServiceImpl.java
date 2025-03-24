@@ -99,7 +99,7 @@ public class PatientServiceImpl implements PatientService {
     @Transactional
     public void deletePatient(Long id) {
         patientValidator.requireNonNull(id, "Patient ID cannot be null");
-        patientValidator.validatePatientExists(id);
+        patientValidator.validateDentistExists(id);
 
         patientRepository.deleteById(id);
     }

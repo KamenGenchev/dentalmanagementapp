@@ -1,6 +1,7 @@
 package com.dentalmanagementapp.util;
 
 import com.dentalmanagementapp.exception.custom.NoAuthorizedUserException;
+import com.dentalmanagementapp.security.CurrentUser;
 import com.dentalmanagementapp.security.CustomUserDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,6 +12,14 @@ import java.util.Random;
 
 @Component
 public class SecurityUtil { //todo
+    public CurrentUser getCurrentUserContext() {
+        Long userId = getCurrentUserId();
+        boolean isAdmin = isAdmin();
+        boolean isDentist = isDentist();
+        boolean isPatient = isPatient();
+        return new CurrentUser(userId, isAdmin, isDentist, isPatient);
+    }
+
     public Long getCurrentUserId() {
         return getCurrentUser().getId();
     }
@@ -20,6 +29,7 @@ public class SecurityUtil { //todo
         if (authentication == null) {
             throw new NoAuthorizedUserException();
         }
+
         if (authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
             return userDetails;
         }
@@ -52,8 +62,7 @@ public class SecurityUtil { //todo
     }
 
     private boolean hasRole(String role) {
-        CustomUserDetails user = getCurrentUser();
-        return user.getAuthorities().contains(new SimpleGrantedAuthority(role));
+        return getCurrentUser().getAuthorities().contains(new SimpleGrantedAuthority(role));
     }
 }
     
